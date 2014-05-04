@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<formations>
+    <formation>
+        <nom>thomastheboss</nom>
+        <nbcred>160</nbcred>
+        <nbsem>4</nbsem>
+    </formation>
+    <formation>
+        <nom>boumbadaboum</nom>
+        <nbcred>200</nbcred>
+        <nbsem>5</nbsem>
+    </formation>
+    <formation>
+        <nom>troubadour</nom>
+        <nbcred>100</nbcred>
+        <nbsem>5</nbsem>
+    </formation>
+    <formation>
+        <nom>shtroumph</nom>
+        <nbcred>230</nbcred>
+        <nbsem>6</nbsem>
+    </formation>
+    <formation>
+        <nom>funambule</nom>
+        <nbcred>150</nbcred>
+        <nbsem>4</nbsem>
+    </formation>
+    <formation>
+        <nom>tutudancing</nom>
+        <nbcred>120</nbcred>
+        <nbsem>6</nbsem>
+    </formation>
+</formations>
