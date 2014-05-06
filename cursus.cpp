@@ -29,6 +29,26 @@ void formation::ajouter_UV(UV* uv)
     uvs[nbUV++]=uv;
 }
 
+void formation::supprimer_UV(const QString& code)
+{
+    if(QMessageBox::information(0,"Retrait d'une UV","Voulez vous retirer l'UV "+code+" de la formation "+nom+" ?",QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Ok)
+    {
+        unsigned int i=0;
+        while(uvs[i]->getCode()!=code) i++;
+        for(unsigned int k=i;k<nbUV-1;k++) uvs[k]=uvs[k+1];
+        uvs[nbUV--]=0;
+    }
+}
+
+const UV* formation::trouverUV(const QString &code)
+{
+    for(unsigned int i=0;i<nbUV;i++)
+    {
+        if(uvs[i]->getCode()==code) return uvs[i];
+    }
+    return 0;
+}
+
 iterateur<UV>& formation::getIterateurUV()
 {
     iterateur<UV>* it=new iterateur<UV>(uvs,nbUV);
@@ -267,13 +287,10 @@ visualiserFormation::visualiserFormation(cursusManager* cmanager, UVManager* uma
     retour=new QPushButton("Retour",this);
     modif=new QPushButton("Modifier les UVs",this);
     lbluvs=new QLabel("UVs appartenant à la formation:",this);
+    suppr=new QPushButton("Supprimer",this);
+    supprUV=new QComboBox(this);
     uvs=new QLabel(this);
-    QString txt="";
-    for(iterateur<UV>& it=objet->getIterateurUV();!it.isDone();it.next())
-    {
-        txt+=it.courant()->getCode()+"\n";
-    }
-    uvs->setText(txt);
+    update();
 
     hbox1->addWidget(form);
     hbox2->addWidget(cred);
@@ -285,18 +302,40 @@ visualiserFormation::visualiserFormation(cursusManager* cmanager, UVManager* uma
     vbox1->addLayout(hbox3);
     vbox2->addWidget(lbluvs);
     vbox2->addWidget(uvs);
+    vbox2->addWidget(supprUV);
+    vbox2->addWidget(suppr);
     mainbox->addLayout(vbox1);
     mainbox->addLayout(vbox2);
     this->setLayout(mainbox);
 
     QObject::connect(retour, SIGNAL(clicked()),this,SLOT(close()));
     QObject::connect(modif,SIGNAL(clicked()),this,SLOT(moduvs()));
+    QObject::connect(suppr,SIGNAL(clicked()),this,SLOT(supprimer()));
 }
 
 void visualiserFormation::moduvs()
 {
     selectUVsFormation* fenetre=new selectUVsFormation(cman,uman,objet,this);
     fenetre->show();
+}
+
+void visualiserFormation::update()
+{
+    supprUV->clear();
+    uvs->clear();
+    QString txt="";
+    for(iterateur<UV>& it=objet->getIterateurUV();!it.isDone();it.next())
+    {
+        supprUV->addItem(it.courant()->getCode());
+        txt+=it.courant()->getCode()+"\n";
+    }
+    uvs->setText(txt);
+}
+
+void visualiserFormation::supprimer()
+{
+    objet->supprimer_UV(supprUV->currentText());
+    this->update();
 }
 
 selectUVsFormation::selectUVsFormation(cursusManager* cm, UVManager* um, formation* f, visualiserFormation *p)
@@ -310,10 +349,7 @@ selectUVsFormation::selectUVsFormation(cursusManager* cm, UVManager* um, formati
     label1=new QLabel("Sélectionnez une UV pour l'ajouter à la formation "+f->getNom(),this);
     choix=new QComboBox(this);
 
-    for(iterateur<UV>& it=uman->getIterateur();!it.isDone();it.next())
-    {
-        choix->addItem(it.courant()->getCode());
-    }
+    update();
 
     retour=new QPushButton("Retour",this);
     ajouter=new QPushButton("Ajouter",this);
@@ -330,6 +366,16 @@ selectUVsFormation::selectUVsFormation(cursusManager* cm, UVManager* um, formati
 void selectUVsFormation::ajouterUV()
 {
     objet->ajouter_UV(&uman->getUV(choix->currentText()));
-    QMessageBox::information(this,"Ajout d'une UV","UV ajoutée à la formation "+objet->getNom(),QMessageBox::Ok);
-    //parent->update; à implémenter !!!!
+    QMessageBox::information(this,"Ajout d'une UV","UV "+choix->currentText()+" ajoutée à la formation "+objet->getNom(),QMessageBox::Ok);
+    parent->update();
+    this->update();
+}
+
+void selectUVsFormation::update()
+{
+    choix->clear();
+    for(iterateur<UV>& it=uman->getIterateur();!it.isDone();it.next())
+    {
+        if(!objet->trouverUV(it.courant()->getCode())) choix->addItem(it.courant()->getCode());
+    }
 }

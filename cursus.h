@@ -31,12 +31,14 @@ class formation
     formation(const QString& n, unsigned int c, unsigned int s): nom(n), nbCredits(c), nbSemestres(s), uvs(0), nbUV(0), nbMaxUV(0) {}
 
 public:
-    void ajouter_UV(UV*); //template method ??
+    void ajouter_UV(UV*);//template method ??
+    void supprimer_UV(const QString &code);
     ~formation();
     QString getNom() const {return nom;}
     unsigned int getNbCred() const {return nbCredits;}
     unsigned int getNbSem() const {return nbSemestres;}
     void modif(const QString& n, unsigned int c, unsigned int s);
+    const UV* trouverUV(const QString& code);
 
     class iterateur<UV>;
     iterateur<UV>& getIterateurUV();
@@ -153,14 +155,17 @@ class visualiserFormation : public QWidget
     QLabel* semstr;
     QLabel* lbluvs;
     QLabel* uvs;
+    QComboBox* supprUV;
     QPushButton* retour;
     QPushButton* modif;
+    QPushButton* suppr;
 
 public:
     visualiserFormation(cursusManager* cmanager, UVManager* umanager, formation* f);
 public slots:
     void moduvs();
-    //void update(); //A TERMINER !!!!!
+    void update();
+    void supprimer();
 
 };
 
@@ -181,6 +186,7 @@ public:
     selectUVsFormation(cursusManager* cm, UVManager* um, formation* f, visualiserFormation* p);
 public slots:
     void ajouterUV();
+    void update();
 
 };
 
